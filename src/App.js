@@ -1,42 +1,32 @@
-import { useCallback, useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useCallback, useEffect, useState } from 'react';
 
 import './App.css';
-
-import Dial from './components/Dial';
-import { setDimensions, setMouseCoordinates, setMouseDown } from './redux/clientSlice';
+import SecondHandDial from './components/SecondHandDial';
 
 function App() {
 
-  const dispatch = useDispatch();
+  const [ time, setTime ] = useState( new Date() );
+  const [ windowDimensions, setWindowDimensions ] = useState( {
+    width: window.innerWidth || document.body.clientWidth,
+    height: window.innerHeight || document.body.clientHeight,
+  } );
 
-  const handleMouseDown = useCallback( mouseDownEvent => {
-    dispatch( setMouseCoordinates( { x: mouseDownEvent.clientX, y: mouseDownEvent.clientY } ) );
-    dispatch( setMouseDown( true ) );
-  }, [ dispatch ] );
+  const handleResize = useCallback( resizeEvent => setWindowDimensions( { height: resizeEvent.target.innerHeight, width: resizeEvent.target.innerWidth } ), [ setWindowDimensions ] );
 
-  const handleMouseUp = useCallback( () => dispatch( setMouseDown( false ) ), [ dispatch ] );
-
-  const handleMouseMove = useCallback( mouseMoveEvent => dispatch( setMouseCoordinates( { x: mouseMoveEvent.clientX, y: mouseMoveEvent.clientY } ) ), [ dispatch ] );
-  
-  const handleResize = useCallback( resizeEvent => dispatch( setDimensions( { height: resizeEvent.target.innerHeight, width: resizeEvent.target.innerWidth } ) ), [ dispatch ] );
+  const resetTime = () => setTime( new Date() );
 
   useEffect( () => {
-    window.addEventListener( "mousedown", handleMouseDown );
-    window.addEventListener( "mousemove", handleMouseMove );
-    window.addEventListener( "mouseup", handleMouseUp );
     window.addEventListener( "resize", handleResize );
+    const timeInterval = setInterval( resetTime, 1000 );
     return () => {
-      window.removeEventListener( "mousedown", handleMouseDown );
-      window.removeEventListener( "mousemove", handleMouseMove );
-      window.removeEventListener( "mouseup", handleMouseUp );
       window.removeEventListener( "resize", handleResize );
+      clearInterval( timeInterval );
     };
-  }, [ handleMouseDown, handleMouseMove, handleMouseUp, handleResize ] );
+  }, [ handleResize ] );
 
   return (
     <div>
-      <Dial />
+      <SecondHandDial time={ time } dimensions={ windowDimensions } />
     </div>
   );
 

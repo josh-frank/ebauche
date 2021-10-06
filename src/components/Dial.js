@@ -1,22 +1,22 @@
-import { useSelector } from "react-redux";
-
 import styled from "styled-components"
 
-export default function Dial() {
+export default function Dial( { time, dimensions } ) {
 
-    const { height, width } = useSelector( state => state.client );
-
-    return <StyledDial
-        width={ width }
-        height={ height }
-        viewbox={ `0 0 ${ height } ${ width }` }
-    >
-        <circle
-            cx={ Math.floor( width / 2 ) }
-            cy={ Math.floor( height / 2 ) }
-            r={ Math.min( Math.floor( width / 2 ), Math.floor( height / 2 ) ) }
-        />
-    </StyledDial>
+    return <>
+        <StyledDial
+            width={ dimensions.width }
+            height={ dimensions.height }
+            viewbox={ `0 0 ${ dimensions.height } ${ dimensions.width }` }
+        >
+            <circle
+                cx={ Math.floor( dimensions.width / 2 ) }
+                cy={ Math.floor( dimensions.height / 2 ) }
+                r={ Math.min( Math.floor( dimensions.width / 2 ), Math.floor( dimensions.height / 2 ) ) }
+                fill="#eee"
+            />
+            <text x="50" y="50">{ time.getUTCSeconds() }</text>
+        </StyledDial>
+    </>
 
 }
 
